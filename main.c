@@ -1,9 +1,9 @@
 #include "stdio.h"
+#include "stdlib.h"
 
-char cells[32] = {0};
-char *cell = cells;
+char *cells;
+char *cell;
 
-unsigned char input;
 
 void executeCommand(char command);
 
@@ -74,22 +74,46 @@ void executeCommand(char command) {
         *cell = getchar();
         break;
 
-      case '[':
-        brainFuckLoop();
-        break;
-
       case 'm':
         printCells();
         break;
-//      case 10:
-//        printf(" $ ");
+
+      case 'r':
+        cell = cells;
+        break;
+
+      case 'q':
+        exit(0);
+        break;
    }
 }
 
+void executeStream(unsigned char * stream) {
+  unsigned char * iterStream = stream;
+  do {
+    executeCommand(*iterStream);
+    ++iterStream;
+  } while (*iterStream != '\n');
+  printf("\n");
+}
+
 int main() {
-  while ( input != 'q' ) {
-    input = getchar();
-    executeCommand(input);
+  cells = malloc(sizeof(char) * 30000);
+  cell = cells;
+  unsigned char input;
+  unsigned char * inputStream;
+  unsigned char * iterInputStream;
+
+  while (1) {
+    printf("cell= %d value= %d $) ", (int)(cell - cells), *cell);
+    inputStream = malloc(sizeof(char) * 1024);
+    iterInputStream = inputStream;
+    while (*iterInputStream != '\n') {
+      ++iterInputStream;
+      *iterInputStream = getchar();
+    }
+    executeStream(inputStream);
+    free(inputStream);
    }
   return 0;
 }
